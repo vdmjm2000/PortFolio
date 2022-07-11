@@ -1,38 +1,61 @@
 <?php
-
-
-$erreurs = "";
-$db = new PDO('mysql:host=localhost;dbname=to_Do_List;charset=utf8', 'root', '');
-$taches=$db->query('SELECT tache from liste');
-
-
-if (isset($_POST['creer_tache'])) { // On vérifie que la variable POST existe
-    if (empty($_POST['creer_tache'])) {  // On vérifie qu'elle as une valeur
-        $erreurs = 'Vous devez indiquer la valeur de la tâche';
-    } else
-
-        if ($_POST['creer_tache']=="test1") { // On vérifie que la variable POST exist
-              $erreurs = 'Le mot test1 n est pas autorisé';
-    } else {
-        $tache = $_POST['creer_tache'];
-        $db->exec("INSERT INTO liste(tache) VALUES('$tache')"); // On insère la tâche dans la base de donnée
-} 
-}
-
-if(isset($_GET['supprimer_tache'])) {
-    $id = $_GET['supprimer_tache'];
-    $db->exec("DELETE FROM liste WHERE id=$id");
-}
-
-if(isset($_GET['modifier_tache'])) {
-    $modif = $db->query('Select * from liste'); // On exécute une requête visant à récupérer les tâches
-  $id = $_GET['modifier_tache'];
-  $modif = $_GET['modifier_tache'];
-  $db->exec("UPDATE liste SET tache= $modif('tache') where id=$id");
-}
+   session_start();
+   @$nom=$_POST["nom"];
+   @$prenom=$_POST["prenom"];
+   @$email=$_POST["email"];
+   @$pass=$_POST["pass"];
+   @$repass=$_POST["repass"];
+   @$valider=$_POST["valider"];
+   $erreur="";
+   if(isset($valider)){
+      if(empty($nom)) $erreur="Nom laissé vide!";
+      elseif(empty($prenom)) $erreur="Prénom laissé vide!";
+      elseif(empty($prenom)) $erreur="Prénom laissé vide!";
+      elseif(empty($email)) $erreur="E-mail laissé vide!";
+      elseif(empty($pass)) $erreur="Mot de passe laissé vide!";
+      elseif($pass!=$repass) $erreur="Mots de passe non identiques!";
+      else{
+         include("connexion.php");
+         $sel=$pdo->prepare("select id from utilisateurs where email=? limit 1");
+         $sel->execute(array($email));
+         $tab=$sel->fetchAll();
+         if(count($tab)>0)
+            $erreur="E-mail existe déjà!";
+         else{
+            $ins=$pdo->prepare("insert into utilisateurs(nom,prenom,email,pass) values(?,?,?,?)");
+            if($ins->execute(array($nom,$prenom,$email,md5($pass))))
+               header("location:login.php");
+         }   
+      }
+   }
 ?>
-
 <!DOCTYPE html>
+<html>
+   <head>
+      <meta charset="utf-8" />
+      <style>
+         *{
+            font-family:arial;
+         }
+         body{
+            margin:20px;
+         }
+         input{
+            border:solid 1px #2222AA;
+            margin-bottom:10px;
+            padding:16px;
+            outline:none;
+            border-radius:6px;
+         }
+         .erreur{
+            color:#CC0000;
+            margin-bottom:10px;
+         }
+      </style>
+   </head>
+   <body>
+
+   <!DOCTYPE html>
 <html lang="fr">
 
 <head>
@@ -113,66 +136,15 @@ if(isset($_GET['modifier_tache'])) {
 
       <a href="#about" class="btn-scroll scrollto" title=""><i class="bx bx-chevron-down"></i></a>
 
-
-    <div>
-        <p class="header_title">Ma super Todo List ! </p>
-    </div>
-
-    <form class="taches_input" method="post" action="toDoListe.php">
-        <input id="inserer" type="text" name="creer_tache" />
-        <button id="envoyer">Créer</button>
-    </form>
-
-    <table class="header_title">
-        <tr>
-            <th>
-                Numéro tâche
-            </th>
-            <th>
-                Description
-            </th>
-            <th>
-                Modifier
-            </th>
-            <th>
-                Suppression
-            </th>
-        </tr>
-</div>
-
-        <?php
-        $reponse = $db->query('Select * from liste'); // On exécute une requête visant à récupérer les tâches
-        while ($taches = $reponse->fetch()) { // On initialise une boucle
-        ?>
-            <tr>
-                <td  class="border_table"><?php echo $taches['id'] ?></td>
-                <td><?php echo $taches['tache'] ?></td>
-                <td><a class="suppr" href="toDoListe.php?modifier_tache=<?php echo $taches['id']?>"> modifier</a>
-
-                <td><a class="suppr" href="toDoListe.php?supprimer_tache=<?php echo $taches['id'] ?>"> &#x1F5D1;</a>
-            </tr>
-        <?php
-        }
-
-
-        ?>
-
-    </table>
-
-        <?php
-    if (isset($erreurs))
-    ?>
-    <p class= "messageVide"><?php echo $erreurs ?></p>
-
-    <?php
-    ?>
-    </section><!-- End Hero -->
-
-
-
-
-
-
-</body>
-
+      <h1>Inscription</h1>
+      <div class="erreur"><?php echo $erreur ?></div>
+      <form name="fo" method="post" action="">
+         <input type="text" name="nom" placeholder="Nom" value="<?php echo $nom?>" /><br />
+         <input type="text" name="prenom" placeholder="Prénom" value="<?php echo $prenom?>" /><br />
+         <input type="text" name="email" placeholder="E-mail" value="<?php echo $email?>" /><br />
+         <input type="password" name="pass" placeholder="Mot de passe" /><br />
+         <input type="password" name="repass" placeholder="Confirmer Mot de passe" /><br />
+         <input type="submit" name="valider" value="S'inscrire" />
+      </form>
+   </body>
 </html>

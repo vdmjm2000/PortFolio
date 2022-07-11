@@ -60,12 +60,20 @@ h1, h2, h3, h4, h5, h6 {
 /*--------------------------------------------------------------
 # Header
 --------------------------------------------------------------*/
+
+
 #header {
   z-index: 997;
   transition: all 0.5s;
   height: 80px;
   background: rgba(25, 28, 31, 0.8);
 }
+
+.header_title {
+
+color: white;
+}
+
 #header.header-transparent {
   background: transparent;
 }
@@ -1187,4 +1195,41 @@ h3 {
 }
 #footer .credits {
   font-size: 13px;
+}
+
+/*--------------------------------------------------------------
+# Liste de tache (toDoListe.php)
+--------------------------------------------------------------*/
+
+table {
+
+border:solid 1px;
+border-color: white;
+text-align: center;
+}
+
+td {
+  border:solid 1px;
+  border-color: white;
+  text-align: center;
+}
+
+th {
+  border:solid 1px;
+  border-color: white;
+  text-align: center;
+}
+
+.messageVide {
+
+  color: red;
+}
+
+/*--------------------------------------------------------------
+# Liste de tache (login.php)
+--------------------------------------------------------------*/
+
+.creerCompte {
+
+  font-size: small;
 }

@@ -1,42 +1,29 @@
 <?php
-
-
-$erreurs = "";
-$db = new PDO('mysql:host=localhost;dbname=to_Do_List;charset=utf8', 'root', '');
-$taches=$db->query('SELECT tache from liste');
-
-
-if (isset($_POST['creer_tache'])) { // On vérifie que la variable POST existe
-    if (empty($_POST['creer_tache'])) {  // On vérifie qu'elle as une valeur
-        $erreurs = 'Vous devez indiquer la valeur de la tâche';
-    } else
-
-        if ($_POST['creer_tache']=="test1") { // On vérifie que la variable POST exist
-              $erreurs = 'Le mot test1 n est pas autorisé';
-    } else {
-        $tache = $_POST['creer_tache'];
-        $db->exec("INSERT INTO liste(tache) VALUES('$tache')"); // On insère la tâche dans la base de donnée
-} 
-}
-
-if(isset($_GET['supprimer_tache'])) {
-    $id = $_GET['supprimer_tache'];
-    $db->exec("DELETE FROM liste WHERE id=$id");
-}
-
-if(isset($_GET['modifier_tache'])) {
-    $modif = $db->query('Select * from liste'); // On exécute une requête visant à récupérer les tâches
-  $id = $_GET['modifier_tache'];
-  $modif = $_GET['modifier_tache'];
-  $db->exec("UPDATE liste SET tache= $modif('tache') where id=$id");
-}
+   session_start();
+   @$email=$_POST["email"];
+   @$pass=md5($_POST["pass"]);
+   @$valider=$_POST["valider"];
+   $erreur="";
+   if(isset($valider)){
+      include("connexion.php");
+      $sel=$pdo->prepare("select * from utilisateurs where email=? and pass=? limit 1");
+      $sel->execute(array($email,$pass));
+      $tab=$sel->fetchAll();
+      if(count($tab)>0){
+         $_SESSION["prenomNom"]=ucfirst(strtolower($tab[0]["prenom"])).
+         " ".strtoupper($tab[0]["nom"]);
+         $_SESSION["autoriser"]="oui";
+         header("location:session.php");
+      }
+      else
+         $erreur="Mauvais e-mail ou mot de passe!";
+   }
 ?>
 
 <!DOCTYPE html>
-<html lang="fr">
-
-<head>
-  <meta charset="utf-8">
+<html>
+   <head>
+      <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
   <title>Portfolio</title>
@@ -106,73 +93,25 @@ if(isset($_GET['modifier_tache'])) {
 
 </header><!-- End Header -->
 
-<body>
-
 <section id="hero">
     <div class="hero-container
 
       <a href="#about" class="btn-scroll scrollto" title=""><i class="bx bx-chevron-down"></i></a>
 
+   </body>
+</html>
 
-    <div>
-        <p class="header_title">Ma super Todo List ! </p>
-    </div>
-
-    <form class="taches_input" method="post" action="toDoListe.php">
-        <input id="inserer" type="text" name="creer_tache" />
-        <button id="envoyer">Créer</button>
-    </form>
-
-    <table class="header_title">
-        <tr>
-            <th>
-                Numéro tâche
-            </th>
-            <th>
-                Description
-            </th>
-            <th>
-                Modifier
-            </th>
-            <th>
-                Suppression
-            </th>
-        </tr>
-</div>
-
-        <?php
-        $reponse = $db->query('Select * from liste'); // On exécute une requête visant à récupérer les tâches
-        while ($taches = $reponse->fetch()) { // On initialise une boucle
-        ?>
-            <tr>
-                <td  class="border_table"><?php echo $taches['id'] ?></td>
-                <td><?php echo $taches['tache'] ?></td>
-                <td><a class="suppr" href="toDoListe.php?modifier_tache=<?php echo $taches['id']?>"> modifier</a>
-
-                <td><a class="suppr" href="toDoListe.php?supprimer_tache=<?php echo $taches['id'] ?>"> &#x1F5D1;</a>
-            </tr>
-        <?php
-        }
-
-
-        ?>
-
-    </table>
-
-        <?php
-    if (isset($erreurs))
-    ?>
-    <p class= "messageVide"><?php echo $erreurs ?></p>
-
-    <?php
-    ?>
-    </section><!-- End Hero -->
-
-
-
-
-
-
-</body>
-
+   <body onLoad="document.fo.login.focus()">
+      <h1>Authentification </h1>
+      <br>
+      <div class="erreur"><?php echo $erreur ?></div>
+      <form name="fo" method="post" action="">
+         <input type="text" name="email" placeholder="E-mail" /><br />
+         <input type="password" name="pass" placeholder="Mot de passe" /><br />
+         <input type="submit" name="valider" value="S'authentifier" />
+      </form>
+      <br>
+      <br>
+      <h2> [ <a href="inscription.php">Créer un compte</a> ]</h2>
+   </body>
 </html>

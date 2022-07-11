@@ -13,8 +13,8 @@
 }
  
 body {
-    margin : 0;
-}
+    font-family: "Open Sans", sans-serif;
+    color: #444444;}
  
 .taches_input {
     width : 600px;

@@ -1,35 +1,10 @@
 <?php
-
-
-$erreurs = "";
-$db = new PDO('mysql:host=localhost;dbname=to_Do_List;charset=utf8', 'root', '');
-$taches=$db->query('SELECT tache from liste');
-
-
-if (isset($_POST['creer_tache'])) { // On vérifie que la variable POST existe
-    if (empty($_POST['creer_tache'])) {  // On vérifie qu'elle as une valeur
-        $erreurs = 'Vous devez indiquer la valeur de la tâche';
-    } else
-
-        if ($_POST['creer_tache']=="test1") { // On vérifie que la variable POST exist
-              $erreurs = 'Le mot test1 n est pas autorisé';
-    } else {
-        $tache = $_POST['creer_tache'];
-        $db->exec("INSERT INTO liste(tache) VALUES('$tache')"); // On insère la tâche dans la base de donnée
-} 
-}
-
-if(isset($_GET['supprimer_tache'])) {
-    $id = $_GET['supprimer_tache'];
-    $db->exec("DELETE FROM liste WHERE id=$id");
-}
-
-if(isset($_GET['modifier_tache'])) {
-    $modif = $db->query('Select * from liste'); // On exécute une requête visant à récupérer les tâches
-  $id = $_GET['modifier_tache'];
-  $modif = $_GET['modifier_tache'];
-  $db->exec("UPDATE liste SET tache= $modif('tache') where id=$id");
-}
+   try{
+      $pdo=new PDO("mysql:host=localhost;dbname=to_do_list","root","");
+   }
+   catch(PDOException $e){
+      echo $e->getMessage();
+   }
 ?>
 
 <!DOCTYPE html>
@@ -113,66 +88,6 @@ if(isset($_GET['modifier_tache'])) {
 
       <a href="#about" class="btn-scroll scrollto" title=""><i class="bx bx-chevron-down"></i></a>
 
-
-    <div>
-        <p class="header_title">Ma super Todo List ! </p>
-    </div>
-
-    <form class="taches_input" method="post" action="toDoListe.php">
-        <input id="inserer" type="text" name="creer_tache" />
-        <button id="envoyer">Créer</button>
-    </form>
-
-    <table class="header_title">
-        <tr>
-            <th>
-                Numéro tâche
-            </th>
-            <th>
-                Description
-            </th>
-            <th>
-                Modifier
-            </th>
-            <th>
-                Suppression
-            </th>
-        </tr>
-</div>
-
-        <?php
-        $reponse = $db->query('Select * from liste'); // On exécute une requête visant à récupérer les tâches
-        while ($taches = $reponse->fetch()) { // On initialise une boucle
-        ?>
-            <tr>
-                <td  class="border_table"><?php echo $taches['id'] ?></td>
-                <td><?php echo $taches['tache'] ?></td>
-                <td><a class="suppr" href="toDoListe.php?modifier_tache=<?php echo $taches['id']?>"> modifier</a>
-
-                <td><a class="suppr" href="toDoListe.php?supprimer_tache=<?php echo $taches['id'] ?>"> &#x1F5D1;</a>
-            </tr>
-        <?php
-        }
-
-
-        ?>
-
-    </table>
-
-        <?php
-    if (isset($erreurs))
-    ?>
-    <p class= "messageVide"><?php echo $erreurs ?></p>
-
-    <?php
-    ?>
-    </section><!-- End Hero -->
-
-
-
-
-
-
-</body>
+      </body>
 
 </html>
